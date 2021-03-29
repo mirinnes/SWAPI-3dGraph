@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
-import './app.css';
+import './App.css';
 import { useQuery, gql } from '@apollo/client';
 const ALL_PLANETS = gql`
 	{
