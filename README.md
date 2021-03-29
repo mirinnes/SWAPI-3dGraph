@@ -4,9 +4,9 @@ Demo: https://swapi-3dgraph.netlify.app/
 
 It implements: 
 
-API: https://swapi.dev/
-GraphQL Schema: https://swapi.apis.guru
-3d Force Graph: https://github.com/vasturiano/3d-force-graph
+- API: https://swapi.dev/
+- GraphQL Schema: https://swapi.apis.guru
+- 3d Force Graph: https://github.com/vasturiano/3d-force-graph
 
 # Getting Started with Create React App
 
