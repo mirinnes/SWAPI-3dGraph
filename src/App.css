@@ -1,38 +1,42 @@
-.App {
-  text-align: center;
+* {
+	box-sizing: border-box;
+	margin: 0;
+	transition: width 0.5s;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.planet-label,
+.film-label {
+	background-color: #29a9e0a2;
+	border-radius: 10px;
+	box-shadow: -2px -2px 3px rgba(255, 255, 255, 0.4),
+		2px 2px 5px rgba(0, 0, 0, 0.07);
+	padding: 10px 15px;
+	color: white;
+	letter-spacing: 3px;
+	font-weight: 300;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.sideBar {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	width: 30vw;
+	height: 50vh;
+	top: 50%;
+	right: 10%;
+	transform: translateY(-50%);
+	background: rgb(41, 169, 224);
+	background: linear-gradient(
+		90deg,
+		rgba(255, 255, 255, 0.363) 0%,
+		rgba(41, 169, 224, 0.363) 100%
+	);
+	border-radius: 10px;
+	box-shadow: inset -2px -2px 3px rgba(255, 255, 255, 0.4),
+		inset 3px 3px 5px rgba(0, 0, 0, 0.07);
+	padding: 10px 5px;
+	color: #111;
+	font-weight: 300;
 }
