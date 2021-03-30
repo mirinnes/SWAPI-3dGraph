@@ -39,13 +39,10 @@ function App() {
 	const [displayFilminfo, setdisplayFilminfo] = useState(false);
 	const [displaySideBar, setdisplaySideBar] = useState(false);
 	const fetched = useQuery(ALL_PLANETS);
-	let gphData = { nodes: [], links: [] };
-	let filmsTitles;
-	let planetsArray;
-
+	let gphData;
 	if (fetched.data) {
-		filmsTitles = getAllFilmsTitlesHelper(fetched.data.allFilms);
-		planetsArray = getAllPlanetsNamessHelper(fetched.data.allPlanets);
+		let filmsTitles = getAllFilmsTitlesHelper(fetched.data.allFilms);
+		let planetsArray = getAllPlanetsNamessHelper(fetched.data.allPlanets);
 		gphData = constructNodesAndLinks(filmsTitles, planetsArray);
 	}
 
