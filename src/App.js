@@ -10,6 +10,7 @@ function App() {
 	const [displayFilminfo, setdisplayFilminfo] = useState(false);
 	const [nodeInfo, setnodeInfo] = useState(false);
 	const fetched = useQuery(ALL_PLANETS);
+	// TODO: The 3d-force-graph *should not* renderize everytime the app listens a change.
 	if (fetched.data) {
 		let filmsTitles = getAllFilmsTitlesHelper(fetched.data.allFilms);
 		let planetsArray = getAllPlanetsNamessHelper(fetched.data.allPlanets);
@@ -27,6 +28,7 @@ function App() {
 	};
 
 	const getHTMLforFilmInfo = () => {
+		// TODO: Make this elements editable.
 		return (
 			<div className='text-container'>
 				<h1>{nodeInfo.label}</h1>
@@ -51,6 +53,7 @@ function App() {
 	};
 
 	const getHTMLforPlanetInfo = () => {
+		// TODO: Make this elements editable.
 		return (
 			<div className='text-container'>
 				<h1 className='up-row'>{nodeInfo.label}</h1>
@@ -102,7 +105,7 @@ function App() {
 				}
 				onNodeClick={(node) => handleOnNodeClick(node)}
 			/>
-			{/*TODO: The elements above must be converted into a React Component <SideBar />*/}
+			{/*TODO: The elements below must be converted into a React Component <SideBar />*/}
 			{displaySideBar && nodeInfo && (
 				<div className={`sideBar ${displaySideBar ? 'appear' : ''}`}>
 					{displayFilminfo ? getHTMLforFilmInfo() : getHTMLforPlanetInfo()}
