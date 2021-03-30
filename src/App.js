@@ -1,45 +1,15 @@
 import React, { useState } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
+import { useQuery } from '@apollo/client';
+import { ALL_PLANETS } from './constants';
 import './App.css';
-import { useQuery, gql } from '@apollo/client';
-const ALL_PLANETS = gql`
-	{
-		allPlanets {
-			planets {
-				name
-				climates
-				diameter
-				orbitalPeriod
-				population
-				filmConnection {
-					films {
-						title
-					}
-				}
-			}
-		}
-		allFilms {
-			films {
-				title
-				episodeID
-				director
-				producers
-				characterConnection(first: 5) {
-					characters {
-						name
-					}
-				}
-			}
-		}
-	}
-`;
 
 function App() {
-	const [nodeInfo, setnodeInfo] = useState(false);
-	const [displayFilminfo, setdisplayFilminfo] = useState(false);
-	const [displaySideBar, setdisplaySideBar] = useState(false);
-	const fetched = useQuery(ALL_PLANETS);
 	let gphData;
+	const [displaySideBar, setdisplaySideBar] = useState(false);
+	const [displayFilminfo, setdisplayFilminfo] = useState(false);
+	const [nodeInfo, setnodeInfo] = useState(false);
+	const fetched = useQuery(ALL_PLANETS);
 	if (fetched.data) {
 		let filmsTitles = getAllFilmsTitlesHelper(fetched.data.allFilms);
 		let planetsArray = getAllPlanetsNamessHelper(fetched.data.allPlanets);
@@ -56,7 +26,7 @@ function App() {
 		setdisplaySideBar(!displaySideBar);
 	};
 
-	const getHTMLforFilm = () => {
+	const getHTMLforFilmInfo = () => {
 		return (
 			<div className='text-container'>
 				<h1>{nodeInfo.label}</h1>
@@ -80,7 +50,7 @@ function App() {
 		);
 	};
 
-	const getHTMLforPlanet = () => {
+	const getHTMLforPlanetInfo = () => {
 		return (
 			<div className='text-container'>
 				<h1 className='up-row'>{nodeInfo.label}</h1>
@@ -132,9 +102,10 @@ function App() {
 				}
 				onNodeClick={(node) => handleOnNodeClick(node)}
 			/>
+			{/*TODO: The elements above must be converted into a React Component <SideBar />*/}
 			{displaySideBar && nodeInfo && (
 				<div className={`sideBar ${displaySideBar ? 'appear' : ''}`}>
-					{displayFilminfo ? getHTMLforFilm() : getHTMLforPlanet()}
+					{displayFilminfo ? getHTMLforFilmInfo() : getHTMLforPlanetInfo()}
 					<button onClick={() => handleOnCloseSideBar()}>Close</button>
 				</div>
 			)}
