@@ -7,6 +7,10 @@ const ALL_PLANETS = gql`
 		allPlanets {
 			planets {
 				name
+				climates
+				diameter
+				orbitalPeriod
+				population
 				filmConnection {
 					films {
 						title
@@ -17,38 +21,105 @@ const ALL_PLANETS = gql`
 		allFilms {
 			films {
 				title
+				episodeID
+				director
+				producers
+				characterConnection(first: 5) {
+					characters {
+						name
+					}
+				}
 			}
 		}
 	}
 `;
 
 function App() {
+	const [nodeInfo, setnodeInfo] = useState(false);
+	const [displayFilminfo, setdisplayFilminfo] = useState(false);
 	const [displaySideBar, setdisplaySideBar] = useState(false);
 	const fetched = useQuery(ALL_PLANETS);
 	let gphData = { nodes: [], links: [] };
+	let filmsTitles;
+	let planetsArray;
+
 	if (fetched.data) {
-		gphData = constructNodesAndLinks(fetched.data);
+		filmsTitles = getAllFilmsTitlesHelper(fetched.data.allFilms);
+		planetsArray = getAllPlanetsNamessHelper(fetched.data.allPlanets);
+		gphData = constructNodesAndLinks(filmsTitles, planetsArray);
 	}
-	const getHTMLsideBar = (onClose) => {
+
+	const handleOnNodeClick = (node) => {
+		setdisplaySideBar(!displaySideBar);
+		node.type === 'film' ? setdisplayFilminfo(true) : setdisplayFilminfo(false);
+		setnodeInfo(node);
+	};
+	const handleOnCloseSideBar = () => {
+		setnodeInfo(false);
+		setdisplaySideBar(!displaySideBar);
+	};
+
+	const getHTMLforFilm = () => {
 		return (
-			<div className='sideBar'>
-				<button onClick={onClose}>Close</button>
-				<h1>DESCRIPCION</h1>
+			<div className='text-container'>
+				<h1>{nodeInfo.label}</h1>
+				<h2 className='up-row'>Episode: {nodeInfo.episodeID}</h2>
+				<div className='left-col'>
+					<h3>Director:</h3> <p>{nodeInfo.director}</p>
+					<h3>Producers:</h3>
+					{nodeInfo.producers.map((producer) => (
+						<p>{producer}</p>
+					))}
+				</div>
+				<div className='right-col'>
+					<h3>Characters:</h3>
+					<ul>
+						{nodeInfo.characters.map((character) => (
+							<li>{character.name}</li>
+						))}
+					</ul>
+				</div>
+			</div>
+		);
+	};
+
+	const getHTMLforPlanet = () => {
+		return (
+			<div className='text-container'>
+				<h1 className='up-row'>{nodeInfo.label}</h1>
+				<div className='left-col'>
+					<h3>Diameter:</h3> <p>{nodeInfo.diameter}</p>
+					<h3>Population:</h3> <p>{nodeInfo.population}</p>
+					<h3>Climates:</h3>
+					{nodeInfo.climates.map((climate) => (
+						<p>{climate}</p>
+					))}
+				</div>
+				<div className='right-col'>
+					<h3>Films:</h3>
+					<ul>
+						{nodeInfo.films.map((film) => (
+							<li>{film}</li>
+						))}
+					</ul>
+				</div>
 			</div>
 		);
 	};
 
 	return (
-		<>
+		<section>
+			<div className='color'></div>
+			<div className='color'></div>
+			<div className='color'></div>
 			<ForceGraph3D
 				graphData={gphData}
 				backgroundColor='#29A9E0'
-				width={displaySideBar ? window.innerWidth / 2 : window.innerWidth}
 				nodeResolution={10}
 				nodeLabel={(node) =>
 					node.type === 'planet'
-						? `<h3 class="planet-label">${node.label.toUpperCase()}</h3>`
-						: `<h3 class="film-label">${node.label.toUpperCase()}</h3>`
+						? `<h3 class="planet-label">${node.label}</h3>`
+						: `<h3 class="film-label">${node.label}</h3>`
 				}
 				onNodeHover={(node) =>
 					(document.getElementById('root').style.cursor = node
@@ -56,21 +127,27 @@ function App() {
 						: null)
 				}
 				nodeColor={(node) =>
-					node.type === 'film' ? 'white' : node.films.length ? 'black' : 'blue'
+					node.type === 'film'
+						? 'black'
+						: node.films.length
+						? '#473BF0'
+						: '#ca9ce1'
 				}
-				onNodeClick={() => setdisplaySideBar(!displaySideBar)}
+				onNodeClick={(node) => handleOnNodeClick(node)}
 			/>
-			{displaySideBar &&
-				getHTMLsideBar(() => setdisplaySideBar(!displaySideBar))}
-		</>
+			{displaySideBar && nodeInfo && (
+				<div className={`sideBar ${displaySideBar ? 'appear' : ''}`}>
+					{displayFilminfo ? getHTMLforFilm() : getHTMLforPlanet()}
+					<button onClick={() => handleOnCloseSideBar()}>Close</button>
+				</div>
+			)}
+		</section>
 	);
 }
 
 export default App;
 
-function constructNodesAndLinks(data) {
-	const filmsTitles = getAllFilmsTitlesHelper(data.allFilms);
-	const planetsArray = getAllPlanetsNamessHelper(data.allPlanets);
+function constructNodesAndLinks(filmsTitles, planetsArray) {
 	const planetWithNoFilmNodes = splitPlanetsWithNoMovies(planetsArray);
 	const planetsWithFilmsNodes = splitPlanetsWithMovies(planetsArray);
 	const planetsWithFilmsLinks = setPlanetsWithFilmsLinksHelper(
@@ -92,18 +169,33 @@ function constructNodesAndLinks(data) {
 
 function getAllFilmsTitlesHelper(allFilms) {
 	return allFilms.films.map((film, i) => {
-		return { id: 'film' + i, label: film.title, type: 'film' };
-	});
-}
-function getAllPlanetsNamessHelper(allPlanets) {
-	return allPlanets.planets.map((planet, i) => {
 		return {
-			id: 'planet' + i,
-			label: planet.name,
-			type: 'planet',
-			films: planet.filmConnection.films.map((film) => film.title),
+			id: 'film' + i,
+			label: film.title,
+			type: 'film',
+			episodeID: film.episodeID,
+			director: film.director,
+			producers: film.producers,
+			characters: film.characterConnection.characters,
 		};
 	});
+}
+
+function getAllPlanetsNamessHelper(allPlanets) {
+	return allPlanets.planets
+		.map((planet, i) => {
+			return {
+				id: 'planet' + i,
+				label: planet.name,
+				type: 'planet',
+				films: planet.filmConnection.films.map((film) => film.title),
+				climates: planet.climates,
+				diameter: planet.diameter,
+				orbitalPeriod: planet.orbitalPeriod,
+				population: planet.population,
+			};
+		})
+		.filter((planet) => planet.label !== 'unknown');
 }
 function splitPlanetsWithNoMovies(planets) {
 	return planets.filter((planet) => planet.films.length === 0);
@@ -111,8 +203,8 @@ function splitPlanetsWithNoMovies(planets) {
 function splitPlanetsWithMovies(planets) {
 	return planets.filter((planet) => planet.films.length !== 0);
 }
+
 function setPlanetsWithNoFilmLinksHelper(planetsWithNoFilm) {
-	//console.log(`planetsWithNoFilm`, planetsWithNoFilm);
 	let links = planetsWithNoFilm.map((planet, i) => {
 		let planetLinks = [];
 		for (let j = i + 1; j < planetsWithNoFilm.length; j++) {
